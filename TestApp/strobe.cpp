@@ -11,7 +11,7 @@ void strobe() {
   if (digitalReadFast(RESTORE) == ON) {
     Serial.println("Restore");
     led(MAGENTA);
-    return;
+    cylinder = -1;
   } else {
     Serial.println("Strobe");
     led(YELLOW);
@@ -31,8 +31,10 @@ void strobe() {
     digitalWriteFast(ADR_ACK, ON);
     delayMicroseconds(5);  // Minimum 2.5 μs, max 7.5 μs)
     digitalWriteFast(ADR_ACK, OFF);
-    Serial.printf("Strobe of cylinder %d\n", cylinder);
-    sdFetchCylinder(cylinder);
+    if (cylinder != -1) {
+      Serial.printf("Strobe of cylinder %d\n", cylinder);
+      sdFetchCylinder(cylinder);
+    }
   }
   digitalWrite(SRW, ON);  // Ready to seek/read/write
   // Strobe must be removed within 5 microseconds of ack. So hopefully we won't immediately re-enter strobe().

@@ -1,4 +1,9 @@
-
+/**
+ * Main program.
+ * Dependencies:
+ * Adafruit_GFX
+ * Adafruit_ILI9341
+ */
 #include "gui.h"
 #include "board.h"
 #include "sd.h"

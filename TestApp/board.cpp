@@ -195,10 +195,6 @@ void loopBoard() {
   lastSectorStartMicros = sectorStartMicros;
   // Check for 400 µs if any read/write/strobe request.
   while (micros() < lastSectorStartMicros + 400) {
-    if (disconnected && sectorCount == 0 && micros() > lastSectorStartMicros + 6) { // Wait for sector mark to end
-      read();
-      break;
-    }
     if (!disconnected) {
       if (digitalReadFast(RD_GATE) == 0) {
         read();

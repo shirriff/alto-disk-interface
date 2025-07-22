@@ -7,10 +7,12 @@ void transmitSector();
 
 /*
  * Handle a read request.
+ * A cylinder has 24 sectors: 12 for each head
  */
 void read() {
-  Serial.println("Read request");
-  prepareSector(sectorCount);
+  int head = digitalReadFast(HEAD_SEL);
+  Serial.printf("Read request: sector %d, head %d\n", sectorCount, head);
+  prepareSector(sectorCount + 12 * head);
   transmitSector();
 }
 
@@ -24,7 +26,8 @@ uint16_t rawData[SECTOR_RAW_LEN];  // Sector contents
 // It also reverses the data, since it is transmitted last-word-first.
 // The result is the 326-word buffer of raw data to transmit.
 void prepareSector(int sectorNum) {
-  uint16_t *sectorData = cylinderData + sectorNum * SECTOR_WORDS;
+  uint16_t *sectorData = cylinderData + sectorNum * SECTOR_WORDS + 1;
+  Serial.printf("Preparing sector %d: %x %x\n", sectorNum, sectorData[0], sectorData[1]);
   bzero(rawData, sizeof(rawData));
   uint16_t *rawPtr = rawData;
   rawPtr += 28;                                   // 28-word preamble
@@ -49,7 +52,7 @@ void prepareSector(int sectorNum) {
   checksum = 0x151;
   for (int i = 0; i < 256; i++) {
     // 256-word data
-    uint16_t wrd = sectorData[10 + 256 - i];
+    uint16_t wrd = sectorData[10 + 255 - i];
     *rawPtr++ = wrd;
     checksum ^= wrd;
   }
@@ -74,7 +77,7 @@ void transmitSector() {
   for (int i = 0; i < SECTOR_RAW_LEN * 16; i++) {
     uint16_t dataWord = rawData[i >> 4];
     int dataBit = dataWord & (1 << (15 - (i % 16)));
-    if (digitalReadFast(RD_GATE)) {  // Only send if RD_GATE is active XXX adjust timing
+    if (digitalReadFast(RD_GATE) == 0) {  // Only send if RD_GATE is active XXX adjust timing
       if (dataBit) {
         // Write a 1
         digitalWriteFast(RD_CLK, ON);  // clk on
