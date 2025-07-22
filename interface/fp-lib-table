@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name interface)(type KiCad)(uri /Users/ken/blog/Alto/disk-interface/interface)(options "")(descr ""))
+)
