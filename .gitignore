@@ -2,6 +2,7 @@
 interface/*.gbr
 interface/*.gbrjob
 interface/*.pdf
+!interface/schematic.pdf
 
 # From https://github.com/github/gitignore/blob/main/KiCad.gitignore
 # For PCBs designed using KiCad: https://www.kicad.org/
